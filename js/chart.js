@@ -32,6 +32,8 @@ PIKTOCHART.Chart.prototype.generateChart = function() {
     var label = null;
     var labelText = null;
 
+    var obj = this;
+
     // Appends a new chart with id to .group-content
     return function(id, editorContent) {
         chart = document.createElement('content');
@@ -41,7 +43,7 @@ PIKTOCHART.Chart.prototype.generateChart = function() {
         icons.className = 'icons';
 
         chartIcon = document.createElement('i');
-        chartIcon.className = 'chart-icon ' + 'flaticon-' + this.icon;
+        chartIcon.className = 'chart-icon ' + 'flaticon-' + obj.icon;
 
         label = document.createElement('div');
         label.className = 'label';
@@ -52,14 +54,14 @@ PIKTOCHART.Chart.prototype.generateChart = function() {
         editorContent.appendChild(chart);
         chart.appendChild(icons);
 
-        for (var j = 0; j < this.iconNumber; j++) {
+        for (var j = 0; j < obj.iconNumber; j++) {
             icons.appendChild(chartIcon.cloneNode(true));
         }
 
         chart.appendChild(label);
 
         label.appendChild(labelText);
-        labelText.appendChild(document.createTextNode(this.label));
+        labelText.appendChild(document.createTextNode(obj.label));
 
         chart = null;
         icons = null;
