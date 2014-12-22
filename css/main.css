@@ -1,13 +1,19 @@
 @charset "utf-8";
 
+body {
+    background: #f4f7fc;
+    position: relative;
+    margin:0px;
+}
+
 div#toolbar {
+    position: relative;
     top: 0px;
     width: 100%;
     min-width: 800px;
     background: #808fab;
 
     border: 2px solid black;
-    border-radius: 5px;
 }
 
 img.tool-btn {
@@ -20,10 +26,10 @@ img.tool-btn {
 }
 
 div#editor {
-    border: 2px solid #808fab;
+    border: 2px solid black;
     border-radius: 5px;
 
-    margin-top: 2px;
+    margin-top: -2px;
     position: relative;
     display: block;
     width: 100%;
@@ -47,13 +53,17 @@ p.label-text {
     text-align: center;
 }
 
+i {
+    display: inline-block;
+    position: relative;
+    z-index: -1;
+}
+
 i.chart-icon:before {
     font-size: 32px;
-    display: inline-block;
 }
 
 i.chart-icon {
     margin-left: -8px;
     margin-right: -8px;
-    display: inline-block;
 }

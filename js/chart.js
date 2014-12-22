@@ -3,6 +3,8 @@ var PIKTOCHART = PIKTOCHART || {};
 /* Constant variables */
 PIKTOCHART.SVG_NS = 'http://www.w3.org/2000/svg';
 PIKTOCHART.XLINK_NS = 'http://www.w3.org/1999/xlink';
+PIKTOCHART.EDITOR_MIN_WIDTH = '800px';
+PIKTOCHART.EDITOR_MIN_HEIGHT = '600px';
 
 /**
  * @public
@@ -54,7 +56,7 @@ PIKTOCHART.Chart.prototype.generateChart = function() {
         editorContent.appendChild(chart);
         chart.appendChild(icons);
 
-        for (var j = 0; j < obj.iconNumber; j++) {
+        for (var i = 0; i < obj.iconNumber; i++) {
             icons.appendChild(chartIcon.cloneNode(true));
         }
 
@@ -75,10 +77,12 @@ var data = [];
 
 // Initialize temp data
 function init() {
-    data.push(new PIKTOCHART.Chart('Women', 120, 10, 'women13'));
+    data.push(new PIKTOCHART.Chart('Women', 120, 5, 'women13'));
     data.push(new PIKTOCHART.Chart('Dog', 60, 10, 'dog77'));
     data.push(new PIKTOCHART.Chart('Cat', 70, 10, 'cat19'));
     data.push(new PIKTOCHART.Chart('Brain', 80, 10, 'brain5'));
+    data.push(new PIKTOCHART.Chart('Dog', 60, 10, 'dog77'));
+    data.push(new PIKTOCHART.Chart('Dog', 120, 2, 'dog77'));
 }
 
 /* Run programme */
