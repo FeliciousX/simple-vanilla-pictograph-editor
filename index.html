@@ -2,24 +2,113 @@
 <html>
     <head>
         <title>Pictogram Chart Editor</title>
+        <meta charset=UTF-8>
         <link href="css/flaticon/flaticon.css" rel="stylesheet" type="text/css" />
         <link href="css/main.css" rel="stylesheet" type="text/css" />
     </head>
     <body>
-        <div id="toolbar">
-            <!-- Buttons at the top for the editor -->
-        </div>
-        <div id="editor">
-            <!-- Where the chart should be displayed -->
-        </div>
-        <div id="user-form">
-            <!-- Where user add data, choose icons, etc -->
-        </div>
-        
-        
-        <footer>
-            <div>Icons made by <a href="http://www.freepik.com" title="Freepik">Freepik</a>, <a href="http://www.icons8.com" title="Icons8">Icons8</a>, <a href="http://yanlu.de" title="Yannick">Yannick</a>, <a href="http://icon-works.com" title="Icon Works">Icon Works</a> from <a href="http://www.flaticon.com" title="Flaticon">www.flaticon.com</a>         is licensed by <a href="http://creativecommons.org/licenses/by/3.0/" title="Creative Commons BY 3.0">CC BY 3.0</a></div>
-        </footer>
-        <script type="text/javascript" src="js/chart.js"></script>
+            <div id="toolbar">
+                <!-- Buttons at the top for the editor -->
+                <img class="tool-btn" src="css/flaticon/svg/back57.svg" height="64" alt="Undo" />
+                <img class="tool-btn" src="css/flaticon/svg/delete85.svg" height="64" alt="Undo" />
+            </div>
+            <div id="editor">
+                <!-- Where the chart should be displayed -->
+                <div class="group-content" id="editorContent">
+                    <!--
+                        <content id="data1">
+                        <div class="icons">
+                        <i class="flaticon-women13 chart-icon"></i>
+                        <i class="flaticon-women13 chart-icon"></i>
+                        <i class="flaticon-women13 chart-icon"></i>
+                        <i class="flaticon-women13 chart-icon"></i>
+                        <i class="flaticon-women13 chart-icon"></i>
+                        <i class="flaticon-women13 chart-icon"></i>
+                        <i class="flaticon-women13 chart-icon"></i>
+                        <i class="flaticon-women13 chart-icon"></i>
+                        <i class="flaticon-women13 chart-icon"></i>
+                        <i class="flaticon-women13 chart-icon"></i>
+                        <i class="flaticon-women13 chart-icon"></i>
+                        <i class="flaticon-women13 chart-icon"></i>
+                        <i class="flaticon-women13 chart-icon"></i>
+                        <i class="flaticon-women13 chart-icon"></i>
+                        <i class="flaticon-women13 chart-icon"></i>
+                        <i class="flaticon-women13 chart-icon"></i>
+                        <i class="flaticon-women13 chart-icon"></i>
+                        <i class="flaticon-women13 chart-icon"></i>
+                        <i class="flaticon-women13 chart-icon"></i>
+                        <i class="flaticon-women13 chart-icon"></i>
+                        </div>
+                        <div class="label">
+                        <p class="label-text">Women</p>
+                        </div>
+                        </content>
+                        <content id="data2">
+                        <div class="icons">
+                        <i class="flaticon-dog77 chart-icon"></i>
+                        <i class="flaticon-dog77 chart-icon"></i>
+                        <i class="flaticon-dog77 chart-icon"></i>
+                        <i class="flaticon-dog77 chart-icon"></i>
+                        <i class="flaticon-dog77 chart-icon"></i>
+                        <i class="flaticon-dog77 chart-icon"></i>
+                        <i class="flaticon-dog77 chart-icon"></i>
+                        </div>
+                        <div class="label">
+                        <p class="label-text">Dog</p>
+                        </div>
+                        </content>
+                        <content id="data3">
+                        <div class="icons">
+                        <i class="flaticon-cat19 chart-icon"></i>
+                        <i class="flaticon-cat19 chart-icon"></i>
+                        <i class="flaticon-cat19 chart-icon"></i>
+                        <i class="flaticon-cat19 chart-icon"></i>
+                        <i class="flaticon-cat19 chart-icon"></i>
+                        <i class="flaticon-cat19 chart-icon"></i>
+                        </div>
+                        <div class="label">
+                        <p class="label-text">Cat</p>
+                        </div>
+                        </content>
+                        <content id="data4">
+                        <div class="icons">
+                        <i class="flaticon-brain5 chart-icon"></i>
+                        <i class="flaticon-brain5 chart-icon"></i>
+                        <i class="flaticon-brain5 chart-icon"></i>
+                        <i class="flaticon-brain5 chart-icon"></i>
+                        <i class="flaticon-brain5 chart-icon"></i>
+                        <i class="flaticon-brain5 chart-icon"></i>
+                        <i class="flaticon-brain5 chart-icon"></i>
+                        </div>
+                        <div class="label">
+                        <p class="label-text">Brain</p>
+                        </div>
+                        </content>
+                        -->
+                </div>
+            </div>
+            <div id="userForm">
+                <!-- Where user edit data, choose icons, etc -->
+                <!-- comment out
+                    <div class="data">
+                    <p>Women</p>
+                    <p>50</p>
+                    <button>Delete</button>
+                    </div>
+
+                    <div class="user-input">
+                    <input class="text" type="text" name="" id="label_name" value="" placeholder="Data Name" />
+                    <input class="text" type="text" name="" id="label_name" value="" placeholder="Data Value" />
+                    <button>Add</button>
+                    </div>
+                -->
+            </div>
+
+            <!-- footer
+                <footer>
+                <div>Icons made by <a href="http://www.freepik.com" title="Freepik">Freepik</a>, <a href="http://www.icons8.com" title="Icons8">Icons8</a>, <a href="http://yanlu.de" title="Yannick">Yannick</a>, <a href="http://icon-works.com" title="Icon Works">Icon Works</a> from <a href="http://www.flaticon.com" title="Flaticon">www.flaticon.com</a>         is licensed by <a href="http://creativecommons.org/licenses/by/3.0/" title="Creative Commons BY 3.0">CC BY 3.0</a></div>
+                </footer>
+            -->
+            <script type="text/javascript" src="js/chart.js"></script>
     </body>
 </html>
