@@ -44,9 +44,8 @@ div.group-content {
 }
 
 content {
-    display: inline-block;
+    position: fixed;
     width: 184px;
-    height: 100%;
 }
 
 p.label-text {
