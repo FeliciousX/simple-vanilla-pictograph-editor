@@ -229,7 +229,7 @@ piktochart.Position.prototype.apply = function(el) {
     if(!isNaN(this.x))
         el.style.left = this.x + 'px';
     if(!isNaN(this.y))
-        el.style.right = this.y + 'px';
+        el.style.top = this.y + 'px';
 };
 
 /**
