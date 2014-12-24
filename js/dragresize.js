@@ -1,147 +1,340 @@
 /**
  * @public
  * @constructor
- * @param el html element or id of element
- * @param attachEl html element the element that will be the drag handle
- * @param lowerBound position object
- * @param upperBound position object
- * @param startCallback on start drag event
- * @param moveCallback on  drag event
- * @param endCallback on drag stop event
- * @param attachLater boolean
+ * @param object name, string
+ * @param config object
  *
- * Code referenced and modified from tech.pro
- * @link http://tech.pro/tutorial/650/javascript-draggable-elements
+ * Does all the heavy lifting for dragging and resizing
  *
- * This object does all the heavy lifting for dragging elements
- * around the editor.
+ * Referenced from a demon on www.thinhelix.com
+ * @link http://www.twinhelix.com/javascript/dragresize/demo/
  */
-piktochart.DragObject = function(el, attachEl, lowerBound, upperBound,
-                    startCallback, moveCallback, endCallback, attachLater) {
+piktochart.DragResize = function(objName, config) {
+    // default properties
+    var props = {
+        myName: objName,                    // Name of the object.
+        enabled: true,                      // Global toggle of drag/resize.
+        handles: ['tl', 'tm', 'tr',
+            'ml', 'mr', 'bl', 'bm', 'br'],  // Array of drag handles: top/mid/bot/right.
+        isElement: null,                    // Function ref to test for an element.
+        isHandle: null,                     // Function ref to test for move handle.
+        element: null,                      // The currently selected element.
+        handle: null,                       // Active handle reference of the element.
+        minWidth: 10, minHeight: 10,        // Minimum pixel size of elements.
+        minLeft: 0, maxLeft: 9999,          // Bounding box area, in pixels.
+        minTop: 0, maxTop: 9999,
+        zIndex: 1,                          // The highest Z-Index yet allocated.
+        mouseX: 0, mouseY: 0,               // Current mouse position, recorded live.
+        lastMouseX: 0, lastMouseY: 0,       // Last processed mouse positions.
+        mOffX: 0, mOffY: 0,                 // A known offset between position & mouse.
+        elmX: 0, elmY: 0,                   // Element position.
+        elmW: 0, elmH: 0,                   // Element size.
+        allowBlur: true,                    // Whether to allow automatic blur onclick.
+        ondragfocus: null,                  // Event handler functions.
+        ondragstart: null,
+        ondragmove: null,
+        ondragend: null,
+        ondragblur: null
+    }
 
-    var cursorStartPos = null;
-    var elementStartPos = null;
-    var dragging = false;
-    var listening = false;
-    var disposed = false;
+    for(var p in props) // if config variable is passed in, use them instead
+        this[p] = (typeof (config[p]) == 'undefined') ? props[p] : config[p];
+};
 
+// Adds event handler to specified element
+piktochart.DragResize.prototype.apply = function(el) {
     if(typeof(el) == 'string')
         el = document.getElementById(el);
     if(el == null)
         return;
 
-    if(lowerBound != null && upperBound != null) {
-        var temp = lowerBound.min(upperBound);
-        upperBound = lowerBound.max(upperBound);
-        lowerBound = temp;
+    var obj = this;
+
+    piktochart.event.addListener(el, 'mousedown', function(e) { obj.mouseDown(e); });
+    piktochart.event.addListener(el, 'mousemove', function(e) { obj.mouseMove(e); });
+    piktochart.event.addListener(el, 'mouseup', function(e) { obj.mouseUp(e); });
+};
+
+// Select an element to drag
+piktochart.DragResize.prototype.select = function(el) {
+    if(typeof(el) == 'string')
+        el = document.getElementById(el);
+
+    if(!this.enabled || el == null || el === this.element)
+        return;
+
+    this.element = el;
+    // bring element forward and apply resize handles
+    this.element.style.zIndex = ++this.zIndex;
+    if(this.resizeHandleSet)
+        this.resizeHandleSet(this.element, true);
+    // record element attributes for mouseMove()
+    this.elmX = parseInt(this.element.style.left);
+    this.elmY = parseInt(this.element.style.top);
+    this.elmW = this.element.offsetWidth;
+    this.elmH = this.element.offsetHeight;
+    if(this.ondragfocus)
+        this.ondragfocus();
+};
+
+// Immediately stops dragging an element. If 'delHandles' is true, this
+// remove the handles from the element and clears the element flag,
+// completely resetting the editor
+piktochart.DragResize.prototype.deselect = function(delHandles) {
+    if(!this.enabled)
+        return;
+
+    if(delHandles) {
+        if(this.ondragblur)
+            this.ondragblur();
+        if(this.resizeHandleSet)
+            this.resizeHandleSet(this.element, false);
+        this.element = null;
     }
 
-    // public methods
-    this.startListening = function() {
-        if(listening || disposed)
-            return;
+    this.handle = null;
+    this.mOffX = 0;
+    this.mOffY = 0;
+};
 
-        listening = true;
-        piktochart.event.addListener(attachEl, "mousedown", dragStart_);
-    };
+// Suitable elements are selected for drag/resize on mousedown.
+// We also initialise the resize boxes, and drag parameters like mouse position etc.
+piktochart.DragResize.prototype.mouseDown = function(e) {
+    if(!this.enabled)
+        return true;
 
-    this.isDragging = function(){ return dragging; };
-    this.isListening = function(){ return listening; };
-    this.isDisposed = function(){ return disposed; };
+    var elm = e.target || e.srcElement; // IE compatibility check
+    var newEl = null;
+    var newHandle = null;
+    // handle's Regular Expression
+    var hRE = new RegExp(this.myName + '-([trmbl]{2})', '');
 
-    this.stopListening = function(stopCurrentDragging) {
-        if(!listening || disposed)
-            return;
+    while(elm) {
+        // Loop up the DOM loking for matching elements.
+        if(elm.className) { // element has classname
+            if(!newHandle && (hRE.test(elm.className) || this.isHandle(elm)))
+                newHandle = elm;
 
-        piktochart.event.removeListener(attachEl, 'mousedown', dragStart_);
-        listening = false;
+            if(this.isElement && this.isElement(elm)) {
+                newEl = elm;
+                break;
+            }
+        }
 
-        if(stopCurrentDragging && dragging)
-            dragStop_();
+        elm = elm.parentNode;
     }
 
-    this.dispose = function() {
-        if(disposed)
-            return;
+    // If this isn't on the last dragged element, call deselect(),
+    // which will hide its handles and clear element.
+    if(this.element && (this.element != newEl) && this.allowBlur)
+        this.deselect(true);
 
-        this.stopListening(true);
-        el = null;
-        attachEl = null;
-        lowerBound = null;
-        upperBound = null;
-        startCallback = null;
-        moveCallback = null;
-        endCallback = null;
-        disposed = true;
+    // If we have a new matching element, call select()
+    if (newEl && (!this.element || (newEl == this.element))) {
+        // stop mouse selection if dragging a handle
+        if(newHandle)
+            piktochart.event.cancelEvent(e);
+
+        this.select(newEl);
+        this.handle = newHandle;
+
+        if(this.handle && ondragstart)
+            this.ondragstart(hRE.test(this.handle.className));
     }
-    // end public methods
+};
 
-    if(typeof(attachEl) == 'string')
-        attachEl = document.getElementById(attachEl);
-    if(attachEl == null)
-        attachEl = el;
+// This continually offsets the dragged element by the difference between the
+// last recorded mouse position (mouseX/Y) and the current mouse position.
+piktochart.DragResize.prototype.mouseMove = function(e) {
+    if (!this.enabled)
+        return true;
 
-    if(!attachLater)
-        this.startListening();
+    // always record the current mouse position
+    this.mouseX = e.pageX || e.clientX + document.documentElement.scrollLeft;
+    this.mouseY = e.pageY || e.clientY + document.documentElement.scrollTop;
 
-    // private methods
-    function dragStart_(eventObj) {
-        if(dragging || !listening || disposed)
-            return;
+    // record relative mouse movement, in case we're dragging
+    // add any previously stored & ignored offset to the calculations
+    var diffX = this.mouseX - this.lastMouseX + this.mOffX;
+    var diffY = this.mouseY - this.lastMouseY + this.mOffY;
+    this.mOffX = 0;
+    this.mOffY = 0;
 
-        dragging = true;
+    // update last processed mouse positions
+    this.lastMouseX = this.mouseX;
+    this.lastMouseY = this.mouseY;
 
-        if(startCallback != null)
-            startCallback(eventObj, el);
+    // stop if we're not dragging element
+    if (typeof(this.handle) == 'undefined' || !this.handle)
+        return true;
 
-        cursorStartPos = piktochart.helper.absoluteCursorPosition(eventObj);
+    // run the resize handle drag if included in the script
+    // create object representing the drag offsets
+    var isResize = false;
+    if(this.resizeHandleDrag && this.resizeHandleDrag(diffX, diffY)) {
+        isResize = true;
 
-        elementStartPos = new piktochart.Position(parseInt(el.style.left),
-                                                parseInt(el.style.top));
+    } else {
+        // If the resize drag handler isn't set or returns false (to indicate the drag was
+        // not on a resize handle), we must be dragging the whole element, so move that.
+        // Bounds check left-right...
+        var dX = diffX;
+        var dY = diffY;
 
-        elementStartPos = elementStartPos.check();
+        if(this.elmX + dX < this.minLeft) {
+            diffX = this.minLeft - this.elmX;
+            this.mOffX = dX - diffX;
 
-        piktochart.event.addListener(document, 'mousemove', dragGo_);
-        piktochart.event.addListener(document, 'mouseup', dragStopHook_);
+        } else if (this.elmX + this.elmW + dX > this.maxLeft) {
+            diffX = this.maxLeft - this.elmX - this.elmW;
+            this.mOffX = dX - diffX;
+        }
 
-        return piktochart.event.cancelEvent(eventObj);
-    }
+        // .. and up-down.
+        if (this.elmY + dY < this.minTop) {
+            diffY = this.minTop - this.elmY;
+            this.mOffY = dY - diffY;
 
-    function dragGo_(eventObj) {
-        if(!dragging || disposed)
-            return;
+        } else if (this.elmY + this.elmH + dY > this.maxTop) {
+            diffY = this.maxTop - this.elmY - this.elmH;
+            this.mOffY = dY - diffY;
+        }
 
-        var newPos = piktochart.helper.absoluteCursorPosition(eventObj);
-        newPos = newPos.add(elementStartPos);
-        newPos = newPos.subtract(cursorStartPos);
-        newPos = newPos.bound(lowerBound, upperBound);
-        newPos.apply(el);
-        if(moveCallback != null)
-            moveCallback(newPos, el);
-
-        return piktochart.event.cancelEvent(eventObj);
-    }
-
-    function dragStopHook_(eventObj) {
-        dragStop_();
-        return piktochart.event.cancelEvent(eventObj);
-    }
-
-    function dragStop_() {
-        if(!dragging || disposed)
-            return;
-
-        piktochart.event.cancelEvent(document, 'mousemove', dragGo_);
-        piktochart.event.cancelEvent(document, 'mouseup', dragStopHook_);
-        cursorStartPos = null;
-        elementStartPos = null;
-
-        if (endCallback != null)
-            endCallback(el);
-
-        dragging = false;
+        this.elmX += diffX;
+        this.elmY += diffY;
     }
 
-    // end private methods
-}
+    // Assign new info back to the element, with minimum dimensions
+    this.element.style.left = this.elmX + 'px';
+    this.element.style.top = this.elmY + 'px';
+    this.element.style.width = this.elmW + 'px';
+    this.element.style.height = this.elmH + 'px';
+
+    if(this.ondragmove)
+        this.ondragmove(this.isResize);
+
+    // stop a normal drag event
+    piktochart.event.cancelEvent(e);
+};
+
+// On mouseup, stop dragging, but don't reset handler visibility.
+piktochart.DragResize.prototype.mouseUp = function(e) {
+    if(!this.enabled)
+        return;
+
+    var hRE = new RegExp(this.myName + '-([trmbl]{2})', '');
+    if (this.handle && this.ondragend)
+        this.ondragend(hRE.test(this.handle.className));
+    this.deselect(false);
+};
+
+// either creates, shows or hides the resize handles within an element
+piktochart.DragResize.prototype.resizeHandleSet = function(el, show) {
+    if(!this.enabled)
+        return;
+
+    if(typeof(el) == 'string')
+        el = document.getElementById(el);
+
+    if(el == null)
+        return;
+
+    if(!el._handle_tr) {
+        for(var h = 0; h < this.handles.length; h++) {
+            // creates 4 new divs, assign specific class
+            var hDiv = document.createElement('div');
+            hDiv.className = this.myName + ' ' + this.myName + '-' + this.handles[h];
+            el['_handle_'+ this.handles[h]] = el.appendChild(hDiv);
+        }
+    }
+
+    // find all the handles and show/hide
+    for(var h = 0; h < this.handles.length; h++) {
+        el['_handle_' + this.handles[h]].style.visibility = show ? 'inherit' : 'hidden';
+    }
+
+    // add border if show, hide otherwise
+    el.style.border = show ? '1px solid black' : 'none';
+};
+
+// Passed the mouse movement amounts. This function checks to see whether the
+// drag is from a resize handle created above; if so, it changes the stored
+// element dimensions and mOffX/Y.
+piktochart.DragResize.prototype.resizeHandleDrag = function(diffX, diffY) {
+    if (!this.enabled)
+        return false;
+
+    var hRE = new RegExp(this.myName + '-([tmblr]{2})');
+    var hClass = '';
+
+    if (this.handle && this.handle.className)
+        hClass = this.handle.className.match(hRE) ? RegExp.$1 : '';
+
+    // If the hClass is one of the resize handles, resize one or two dimensions.
+    // Bounds checking is the hard bit -- basically for each edge, check that the
+    // element doesn't go under minimum size, and doesn't go beyond its boundary.
+    var dY = diffY;
+    var dX = diffX;
+    var processed = false;
+
+    if(hClass.indexOf('t') >= 0) { // top handle
+        if(this.elmH - dY < this.minHeight) {
+            diffY = this.elmH - this.minHeight;
+            this.mOffY = this.dY - diffY;
+
+        } else if(this.elmY + dY < this.minTop) {
+            diffY = this.minTpo - this.elmY;
+            this.mOffY = dY - this.diffy;
+        }
+
+        this.elmY += diffY;
+        this.elmH -= diffY;
+        processed = true;
+    }
+
+    if(hClass.indexOf('b') >= 0) { // bottom handle
+        if(this.elmH + dY < this.minHeight) {
+            diffY = this.minHeight - this.elmH;
+            this.mOffY = dY - diffY;
+
+        } else if(this.elmY + this.elmH + dY > this.maxTop) {
+            diffY = this.maxTop - this.elmY - this.elmH;
+            this.mOffY = dY - diffY;
+        }
+
+        this.elmH += diffY;
+        processed = true;
+    }
+
+    if(hClass.indexOf('l') >= 0) { // left handle
+        if(this.elmW - dX < this.minWidth) {
+            diffX  = this.elmW - this.minWidth;
+            this.mOffX = dX - diffX;
+
+        } else if(this.elmX + dX < this.minLeft) {
+            diffX = this.minLeft - this.elmX;
+            this.mOffX = dX - diffX;
+        }
+
+        this.elmX += diffX;
+        this.elmW -= diffX;
+        processed = true;
+    }
+
+    if(hClass.indexOf('r') >= 0) { // right handle
+        if(this.elmW + dX < this.minWidth) {
+            diffX = this.minWidth - this.elmW;
+            this.mOffX = dX - diffX;
+
+        } else if(this.elmX + this.elmW + dX > this.maxLeft) {
+            diffX = this.maxLeft - this.elmX - this.elmW;
+            this.mOffX = dX - diffX;
+        }
+
+        this.elmW += diffX;
+        processed = true;
+    }
+
+    return processed;
+};
 

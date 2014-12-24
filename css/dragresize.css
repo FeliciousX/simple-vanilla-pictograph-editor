@@ -1,0 +1,73 @@
+@charset "utf-8";
+
+/*
+The main mouse handle that moves the whole element.
+ */
+.drsMoveHandle {
+    cursor: move;
+}
+
+/*
+ * For all the  handles
+ */
+.dragresize {
+    position: absolute;
+    width: 5px;
+    height: 5px;
+    font-size: 1px;
+    background: #EEE;
+    border: 1px solid #333;
+}
+
+/*
+ * Inidividual Corner classes
+ * t = top ,l = left
+ * r = right, m = middle
+ * b = bottom
+ */
+.dragresize-tl {
+    top: -8px;
+    left: -8px;
+    cursor: nw-resize;
+}
+.dragresize-tm {
+    top: -8px;
+    left: 50%;
+    margin-left: -4px;
+    cursor: n-resize;
+}
+.dragresize-tr {
+    top: -8px;
+    right: -8px;
+    cursor: ne-resize;
+}
+
+.dragresize-ml {
+    top: 50%;
+    margin-top: -4px;
+    left: -8px;
+    cursor: w-resize;
+}
+.dragresize-mr {
+    top: 50%;
+    margin-top: -4px;
+    right: -8px;
+    cursor: e-resize;
+}
+
+.dragresize-bl {
+    bottom: -8px;
+    left: -8px;
+    cursor: sw-resize;
+}
+.dragresize-bm {
+    bottom: -8px;
+    left: 50%;
+    margin-left: -4px;
+    cursor: s-resize;
+}
+.dragresize-br {
+    bottom: -8px;
+    right: -8px;
+    cursor: se-resize;
+}

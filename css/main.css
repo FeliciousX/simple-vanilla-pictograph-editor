@@ -1,11 +1,19 @@
 @charset "utf-8";
 
+/*
+ * Main CSS edits the elements on the page from top down
+ * to make it easier to understand. It starts from the body
+ * Then from up all the way down of the page
+ */
+
+/* General UI */
 body {
     background: #f4f7fc;
     position: relative;
     margin:0px;
 }
 
+/* The top toolbar */
 div#toolbar {
     position: relative;
     top: 0px;
@@ -16,8 +24,8 @@ div#toolbar {
     border: 2px solid black;
 }
 
+/* Toolbar buttons */
 img.tool-btn {
-    border: 1px solid black;
     border-radius: 10px;
 
     margin-top: 5px;
@@ -25,6 +33,7 @@ img.tool-btn {
     background: #909fab;
 }
 
+/* the editor */
 div#editor {
     border: 2px solid black;
     border-radius: 5px;
@@ -37,21 +46,19 @@ div#editor {
     height: 600px;
 }
 
+/* This is where the charts are held */
+content {
+    position: absolute;
+}
+
+/* the div that binds the icons and label together */
 div.group-content {
     position: absolute;
     left: 0;
     bottom: 0;
 }
 
-content {
-    position: fixed;
-    width: 184px;
-}
-
-p.label-text {
-    text-align: center;
-}
-
+/* general rules for icons */
 i {
     display: inline-block;
     position: relative;
@@ -65,4 +72,9 @@ i.chart-icon:before {
 i.chart-icon {
     margin-left: -8px;
     margin-right: -8px;
+}
+
+/* chart label */
+p.label-text {
+    text-align: center;
 }

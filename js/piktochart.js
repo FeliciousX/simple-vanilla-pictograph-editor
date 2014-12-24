@@ -4,8 +4,9 @@ var piktochart = piktochart || {};
 piktochart.SVG_NS = 'http://www.w3.org/2000/svg';
 piktochart.XLINK_NS = 'http://www.w3.org/1999/xlink';
 piktochart.EDITOR_MIN_WIDTH = 800;
-piktochart.EDITOR_MIN_HEIGHT = 600;
+piktochart.EDITOR_MAX_HEIGHT = 600;
 piktochart.TOOLBAR_HEIGHT = 64;
+piktochart.ICON_SIZE = 52;
 
 /* Stores all event functions wrapper that is IE compatible */
 piktochart.event = {
@@ -78,26 +79,43 @@ piktochart.Chart = function (label, value, ratio, icon) {
  */
 piktochart.Chart.prototype.generateChart = function() {
     var chart = null;
+    var group = null;
     var icons = null;
     var label = null;
     var labelText = null;
-    var chartIcon = null;
 
     var obj = this;
 
     // Appends a new chart with id to .group-content
     // returns dragObject
-    return function(id, editorContent) {
+    return function(id, editor) {
+        if(typeof(editor) == 'string')
+            editor = document.getElementById(editor);
+
+        if(editor == null)
+            return;
+
         chart = document.createElement('content');
         chart.id = 'data' + id;
-        chart.style.top = piktochart.TOOLBAR_HEIGHT + 15 + 'px';
+        chart.className = 'drsElement drsMoveHandle';
+        chart.style.top = '0px';
         chart.style.left = piktochart.EDITOR_MIN_WIDTH / 2 + 'px';
+        // TODO: make size more dynamic based on number of icons
+        chart.style.width = (piktochart.ICON_SIZE * 5) + 'px';
+        chart.style.height = '35%';
+
+        group  = document.createElement('div');
+        group.className = 'group-content';
 
         icons = document.createElement('div');
         icons.className = 'icons';
 
-        chartIcon = document.createElement('i');
-        chartIcon.className = 'chart-icon ' + 'flaticon-' + obj.icon;
+        for (var i = 0; i < obj.iconNumber; i++) {
+            var chartIcon = document.createElement('i');
+            chartIcon.className = 'chart-icon ' + 'flaticon-' + obj.icon;
+            icons.appendChild(chartIcon);
+            chartIcon = null;
+        }
 
         label = document.createElement('div');
         label.className = 'label';
@@ -105,23 +123,14 @@ piktochart.Chart.prototype.generateChart = function() {
         labelText = document.createElement('p');
         labelText.className = 'label-text';
 
-        editorContent.appendChild(chart);
-        chart.appendChild(icons);
-
-        for (var i = 0; i < obj.iconNumber; i++) {
-            icons.appendChild(chartIcon.cloneNode(true));
-        }
-
-        chart.appendChild(label);
-
+        editor.appendChild(chart);
+        chart.appendChild(group);
+        group.appendChild(icons);
+        group.appendChild(label);
         label.appendChild(labelText);
         labelText.appendChild(document.createTextNode(obj.label));
 
         obj.elem = chart;
-        obj.dragObject = new piktochart.DragObject(chart, null,
-                new piktochart.Position(0, piktochart.TOOLBAR_HEIGHT),
-                new piktochart.Position(piktochart.EDITOR_MIN_WIDTH,
-                    piktochart.EDITOR_MIN_HEIGHT));
 
         chart = null;
         icons = null;
