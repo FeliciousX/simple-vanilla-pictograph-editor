@@ -10,36 +10,55 @@
     <body>
         <div id="toolbar">
             <!-- Buttons at the top for the editor -->
-            <img class="tool-btn" src="css/flaticon/svg/back57.svg" height="64" alt="Undo" />
+            <!-- TODO: add zoom buttons -->
             <img class="tool-btn" src="css/flaticon/svg/delete85.svg" height="64" alt="Undo" />
         </div>
         <div id="editor">
             <!-- Where the chart is displayed -->
         </div>
-        <div id="userForm">
+        <div class="user-input">
             <!-- Where user edits data, choose icons, etc -->
-            <!-- comment out
-                <div class="data">
-                <p>Women</p>
-                <p>50</p>
-                <button>Delete</button>
-                </div>
-
-                <div class="user-input">
-                <input class="text" type="text" name="" id="label_name" value="" placeholder="Data Name" />
-                <input class="text" type="text" name="" id="label_name" value="" placeholder="Data Value" />
-                <button>Add</button>
-                </div>
-            -->
+            <form id="userForm">
+                <input class="text" type="hidden" id="chartId" value="0" />
+                <input class="text" type="text" id="cLabel" value="" placeholder="Data Name" />
+                <input class="text" type="text" id="cValue" value="" placeholder="Data Value" />
+                <input class="text" type="text" id="iRatio" value="" placeholder="Per Icon Value" />
+                <!-- should be loaded dynamically from server side scripting -->
+                <select id="cIcon">
+                    <option value="">- Select -</option>
+                    <option value="basketball35">Baseball</option>
+                    <option value="basketball32">Basketball</option>
+                    <option value="dove">Bird</option>
+                    <option value="brain5">Brain</option>
+                    <option value="aim5">Bullseye</option>
+                    <option value="cat19">Cat</option>
+                    <option value="chicken2">Chicken</option>
+                    <option value="chronograph">Clock</option>
+                    <option value="delete85">Cross</option>
+                    <option value="dog77">Dog</option>
+                    <option value="women13">Female</option>
+                    <option value="fish">Fish</option>
+                    <option value="multiple25">Group of People</option>
+                    <option value="frontal7">Male</option>
+                    <option value="award47">Medal</option>
+                    <option value="user82">Person</option>
+                    <option value="rabbit5">Rabbit</option>
+                    <option value="soccer44">Soccer</option>
+                    <option value="sports5">Sports</option>
+                    <option value="swimmer9">Swimming</option>
+                    <option value="t-shirt1">T-Shirt</option>
+                    <option value="trophy42">Trophy</option>
+                </select>
+                <button id="addChart">Add</button>
+            </form>
         </div>
-
-        <!-- footer
-            <footer>
+        <div id="userData">
+            <!-- Displays current data on the editor -->
+        </div>
+        <footer>
             <div>Icons made by <a href="http://www.freepik.com" title="Freepik">Freepik</a>, <a href="http://www.icons8.com" title="Icons8">Icons8</a>, <a href="http://yanlu.de" title="Yannick">Yannick</a>, <a href="http://icon-works.com" title="Icon Works">Icon Works</a> from <a href="http://www.flaticon.com" title="Flaticon">www.flaticon.com</a>         is licensed by <a href="http://creativecommons.org/licenses/by/3.0/" title="Creative Commons BY 3.0">CC BY 3.0</a></div>
-            </footer>
-        -->
+        </footer>
         <script type="text/javascript" src="js/piktochart.js"></script>
-        <script type="text/javascript" src="js/position.js"></script>
         <script type="text/javascript" src="js/dragresize.js"></script>
         <script type="text/javascript" src="js/main.js"></script>
     </body>

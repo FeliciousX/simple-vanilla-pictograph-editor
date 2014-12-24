@@ -78,3 +78,19 @@ i.chart-icon {
 p.label-text {
     text-align: center;
 }
+
+div.user-input {
+    padding: 5px;
+}
+
+/* Data Display rules */
+div.user-data>p {
+    display: inline;
+    padding-right: 3em;
+}
+
+footer {
+    font-size: 12px;
+    padding-top: 40px;
+    text-align: center;
+}
