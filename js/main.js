@@ -2,7 +2,7 @@
 function main() {
     var drsConfig = {
         minWidth: 64,
-        minHeight: 64,
+        minHeight: 128,
         minLeft: 0,
         minTop: 0,
         maxTop: piktochart.EDITOR_MAX_HEIGHT,
@@ -47,5 +47,6 @@ window.onload = function() {
 
     var addChart = document.getElementById('addChart');
     addChart.onclick = piktochart.helper.createChart;
+    addChart = null;
 
 };

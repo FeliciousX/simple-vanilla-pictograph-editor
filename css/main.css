@@ -84,9 +84,13 @@ div.user-input {
 }
 
 /* Data Display rules */
-div.user-data>p {
-    display: inline;
-    padding-right: 3em;
+table#userData th {
+    padding-left: 20px;
+    padding-right: 20px;
+}
+
+tr.user-data > td {
+    text-align: center;
 }
 
 footer {
