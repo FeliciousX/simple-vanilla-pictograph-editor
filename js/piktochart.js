@@ -68,6 +68,7 @@ piktochart.helper = {
             delete piktochart.chartArr[id];
         }
     },
+    // creates a new chart by taking input from form
     createChart: function(e) {
         piktochart.event.cancelEvent(e);
 
@@ -115,6 +116,9 @@ piktochart.helper = {
 
             chartId.value = parseInt(chartId.value) + 1;
 
+            // reset inputs
+            document.getElementById('userForm').reset();
+
             generate = null;
             chart = null;
             chartId = null;
@@ -125,9 +129,109 @@ piktochart.helper = {
         iRatio = null;
         cIcon = null;
         selectedIcon = null;
+    },
+    // edit existing chart
+    editChart: function(id) {
+        var data = document.getElementById('data_'+id);
 
-        // reset inputs
-        document.getElementById('userForm').reset();
+        var inputs = data.getElementsByTagName('input');
+
+        var cLabel = inputs[0];
+        var cValue = inputs[1];
+        var iRatio = inputs[2];
+        var cIcon = document.getElementById('cIcon_'+id);
+        var selectedIcon = cIcon.options[cIcon.selectedIndex];
+        var complete = true;
+
+        // do form checking
+        if((typeof(selectedIcon) == 'undefined') || selectedIcon.value === '') {
+            cIcon.focus();
+            alert('Please select an icon');
+            complete = false;
+        }
+        if(iRatio.value === '') {
+            iRatio.focus();
+            alert('Icon Value must not be empty');
+            complete = false;
+        }
+        if(cValue.value === '') {
+            cValue.focus();
+            alert('Data Value must not be empty');
+            complete = false;
+        }
+        if(cLabel.value === '') {
+            cLabel.focus();
+            alert('Data Name must not be empty');
+            complete = false;
+        }
+
+        if(complete) { // form checking passed
+            var chart = piktochart.chartArr[id];
+
+            // edit chart with new data
+            chart.edit(cLabel.value, parseInt(cValue.value),
+                    parseInt(iRatio.value), selectedIcon.value);
+
+            chart = null;
+        }
+
+        cLabel = null;
+        cValue = null;
+        iRatio = null;
+        cIcon = null;
+        selectedIcon = null;
+
+        return complete;
+    },
+    // show the inputs to edit chart data
+    toggleChartEdit: function(id) {
+        var cData = document.getElementById('data_' + id);
+        
+        var inputs = cData.getElementsByTagName('input');
+
+        for(var i = 0; i < inputs.length; i++) {
+            inputs[i].removeAttribute('readonly');
+        }
+
+        var selectOptions = document.getElementById('cIcon');
+        var cln = selectOptions.cloneNode(true);
+        cln.id = 'cIcon_'+id;
+
+        // there's only 1 icon
+        var icon = cData.getElementsByTagName('i')[0];
+        var parentDiv = icon.parentNode;
+
+        parentDiv.replaceChild(cln, icon);
+
+        var saveBtn = document.createElement('button');
+        saveBtn.appendChild(document.createTextNode('Save'));
+
+        // is there memory leak here on this function?
+        // I know a closure is created but I dont know if it will leak or not
+        // I can create a separate function just for saving somewhere else
+        // but I'm just going to do this for the sake of comments from Piktochart :)
+        saveBtn.onclick = function(e) {
+            piktochart.event.cancelEvent(e);
+
+            // edit chart
+            var success = piktochart.helper.editChart(id);
+
+            if(success) {
+                for(var i = 0; i < inputs.length; i++)
+                    inputs[i].setAttribute('readonly', 'readonly');
+
+                parentDiv2.replaceChild(editBtn, saveBtn);
+            }
+        };
+
+        // 1st button is the edit button
+        var editBtn = cData.getElementsByTagName('button')[0];
+        var parentDiv2 = editBtn.parentNode;
+
+        parentDiv2.replaceChild(saveBtn, editBtn);
+
+        selectOptions = null;
+        cData = null;
     },
 };
 
@@ -141,9 +245,35 @@ piktochart.Chart = function (label, value, ratio, icon) {
     this.value = value; // Total value of chart
     this.ratio = ratio; // The value of 1 icon
     this.icon = icon;   // icon name used
-    this.iconNumber = this.value / this.ratio; // number of icons needed
+    this.iconNumber = 0; // number of icons needed
     this.elem = null;   // chart DOM reference
     this.data = null;   // data DOM reference
+
+    this.iconNumber = this.getIconNumber();
+};
+
+/**
+* Calculate the number of icons needed
+* @public
+* @return int
+*/
+piktochart.Chart.prototype.getIconNumber = function() {
+    if(this.iconNumber > 0)
+        return this.iconNumber;
+
+    var remain = this.value % this.ratio;
+    var icons = this.value / this.ratio;
+
+    // only if the remainder is more than half the ratio value
+    // adds an extra icon. 
+    if(remain >= this.ratio / 2 || remain === 0) {
+        this.iconNumber = icons;
+        return icons;
+
+    } else {
+        this.iconNumber = icons - 1;
+        return icons - 1;
+    }
 };
 
 /**
@@ -215,35 +345,66 @@ piktochart.Chart.prototype.generateChart = function(id, editor) {
     label = null;
     labelText = null;
     chartIcon = null;
-}
+};
 
-// This function adds a new div that shows the chart data on the bottom of the page
+// This function adds a new tr that shows the chart data on the bottom of the page
 piktochart.Chart.prototype.addDataHTML_ = function(id) {
-    var div = document.createElement('div');
-    var pLabel = document.createElement('p');
-    var pValue = document.createElement('p');
-    var pRatio = document.createElement('p');
-    var pIcon = document.createElement('p');
-    var icon = document.createElement('i');
+    var tr = document.createElement('tr');
+    var editBtn = document.createElement('button');
     var delBtn = document.createElement('button');
+    var pLabel = document.createElement('td');
+    var pValue = document.createElement('td');
+    var pRatio = document.createElement('td');
+    var pIcon = document.createElement('td');
+    var pEditBtn = document.createElement('td');
+    var pDelBtn = document.createElement('td');
+    var icon = document.createElement('i');
+    var input = null;
 
-    div.appendChild(pLabel);
-    div.appendChild(pValue);
-    div.appendChild(pRatio);
-    div.appendChild(pIcon);
-    div.appendChild(delBtn);
-    pLabel.appendChild(document.createTextNode('Label: ' + this.label));
-    pValue.appendChild(document.createTextNode('Value: ' + this.value));
-    pRatio.appendChild(document.createTextNode('Icon Value: ' + this.ratio));
-    pIcon.appendChild(document.createTextNode('Icon Selected: '));
+    tr.appendChild(pLabel);
+    tr.appendChild(pValue);
+    tr.appendChild(pRatio);
+    tr.appendChild(pIcon);
+    tr.appendChild(pEditBtn);
+    tr.appendChild(pDelBtn);
+    
+    input = document.createElement('input');
+    input.value = this.label;
+    input.setAttribute('readonly', 'readonly');
+    pLabel.appendChild(input);
+
+    input = document.createElement('input');
+    input.value = this.value;
+    input.setAttribute('readonly', 'readonly');
+    pValue.appendChild(input);
+
+    input = document.createElement('input');
+    input.value = this.ratio;
+    input.setAttribute('readonly', 'readonly');
+    pRatio.appendChild(input);
+
     pIcon.appendChild(icon);
+    pEditBtn.appendChild(editBtn);
+    pDelBtn.appendChild(delBtn);
+
+    editBtn.appendChild(document.createTextNode('Edit'));
     delBtn.appendChild(document.createTextNode('Delete'));
 
-    div.id = 'data_' + id;
-    div.className = 'user-data';
+    tr.id = 'data_' + id;
+    tr.className = 'user-data';
     icon.className = 'flaticon-' + this.icon;
 
+    editBtn.value = id;
+    editBtn.setAttribute('name', 'edit');
+    editBtn.onclick = function(e) {
+        piktochart.event.cancelEvent(e);
+
+        // edit chart 
+        piktochart.helper.toggleChartEdit(this.value);
+    }
+
     delBtn.value = id;
+    delBtn.setAttribute('name', 'delete');
     delBtn.onclick = function(e) {
         piktochart.event.cancelEvent(e);
 
@@ -251,16 +412,108 @@ piktochart.Chart.prototype.addDataHTML_ = function(id) {
         piktochart.helper.deleteChart(this.value);
     };
 
-    document.getElementById('userData').appendChild(div);
+    document.getElementById('userData').appendChild(tr);
 
-    this.data = div;
+    // add DOM element to object itself
+    this.data = tr;
 
-    div = null;
+    tr = null;
     pLabel = null;
     pValue = null;
     pRatio = null;
     pIcon = null;
     icon = null;
+    editBtn = null
     delBtn = null;
+    pEditBtn = null;
+    pDelBtn = null;
+};
+
+// Edit current chart with new data
+piktochart.Chart.prototype.edit = function(label, value, ratio, icon) {
+
+    // query only once
+    var inputs = this.data.getElementsByTagName('input');
+    var totalIcons = this.elem.getElementsByTagName('i');
+
+    if(label != '' && label !== this.label) {
+        this.label = label;
+
+        // change chart label
+        // there's only 1 <p> element
+        var cLabel = this.elem.getElementsByTagName('p')[0];
+        cLabel.textContent = this.label;
+
+        // first <input> is label
+        inputs[0].value = this.label;
+    }
+
+    if(!isNaN(value) && value !== this.value) {
+        this.value = value;
+
+        // the second <input> is value
+        inputs[1].value = this.value;
+    }
+
+    if(!isNaN(ratio) && ratio !== this.ratio) {
+        this.ratio = ratio;
+
+        // the third <input> shows ratio
+        inputs[2].value = this.ratio;
+    }
+
+    var newIconNumber = this.value / this.ratio;
+    if(!isNaN(newIconNumber) && newIconNumber != this.iconNumber) {
+
+        if(newIconNumber < this.iconNumber) {
+            // delete the extra icons
+            // Delete from behind because the length and index changes while removing
+            for(var i = this.iconNumber - 1; i >= newIconNumber; i--) {
+                totalIcons[i].remove();
+            }
+
+        } else if(newIconNumber > this.iconNumber) {
+            var icons = this.elem.getElementsByClassName('icons')[0];
+            // add more icons!
+            for(var i = this.iconNumber; i < newIconNumber; i++) {
+                var newIcon = document.createElement('i');
+                newIcon.className = 'chart-icon flaticon-'+this.icon;
+                icons.appendChild(newIcon);
+                newIcon = null;
+            }
+
+            icons = null;
+        }
+
+        this.iconNumber = newIconNumber;
+    }
+
+    if(icon != '' && icon !== this.icon) {
+
+        // changing all the icons on the chart
+        for(var i = 0; i < totalIcons.length; i++) {
+            totalIcons[i].className = 'chart-icon flaticon-'+icon;
+        }
+
+        // prepare to replace <select> with icon
+        var cIcon = document.createElement('i');
+        cIcon.className = 'flaticon-' + icon;
+        
+        // there's only 1 <select> element
+        var selectOptions = this.data.getElementsByTagName('select')[0];
+        var parentDiv = selectOptions.parentNode;
+        parentDiv.replaceChild(cIcon, selectOptions);
+
+        cIcon = null;
+        selectOptions = null;
+        parentDiv = null;
+
+
+        this.icon = icon;
+    }
+
+    newIconNumber = null;
+    tr = null;
+    totalIcons = null;
 };
 

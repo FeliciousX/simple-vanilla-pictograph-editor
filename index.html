@@ -10,8 +10,10 @@
     <body>
         <div id="toolbar">
             <!-- Buttons at the top for the editor -->
-            <!-- TODO: add zoom buttons -->
-            <img class="tool-btn" src="css/flaticon/svg/delete85.svg" height="64" alt="Undo" />
+            <div id="group_toolbar">
+                <img class="tool-btn" src="img/flaticon/painter11.svg" alt="Undo" />
+                <img class="tool-btn" src="img/flaticon/delete96.svg" alt="Undo" />
+            </div>
         </div>
         <div id="editor">
             <!-- Where the chart is displayed -->
@@ -52,8 +54,18 @@
                 <button id="addChart">Add</button>
             </form>
         </div>
-        <div id="userData">
+        <div>
             <!-- Displays current data on the editor -->
+            <table id="userData">
+                <tr>
+                    <th>Label</th>
+                    <th>Value</th>
+                    <th>Icon Value</th>
+                    <th>Icon Chosen</th>
+                    <th></th>
+                    <th></th>
+                </tr>
+            </table>
         </div>
         <footer>
             <div>Icons made by <a href="http://www.freepik.com" title="Freepik">Freepik</a>, <a href="http://www.icons8.com" title="Icons8">Icons8</a>, <a href="http://yanlu.de" title="Yannick">Yannick</a>, <a href="http://icon-works.com" title="Icon Works">Icon Works</a> from <a href="http://www.flaticon.com" title="Flaticon">www.flaticon.com</a>         is licensed by <a href="http://creativecommons.org/licenses/by/3.0/" title="Creative Commons BY 3.0">CC BY 3.0</a></div>

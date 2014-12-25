@@ -19,18 +19,23 @@ div#toolbar {
     top: 0px;
     width: 100%;
     min-width: 800px;
-    background: #808fab;
+    background: #85CAE7;
+
+    height: 64px;
 
     border: 2px solid black;
 }
 
 /* Toolbar buttons */
 img.tool-btn {
+    margin-left: 10px;
     border-radius: 10px;
+    width: 60px;
+    height: 60px;
+    background: #CEEAF6;
+    padding: 2px;
 
-    margin-top: 5px;
-    margin-left: 5px;
-    background: #909fab;
+    cursor: pointer;
 }
 
 /* the editor */
@@ -84,9 +89,13 @@ div.user-input {
 }
 
 /* Data Display rules */
-div.user-data>p {
-    display: inline;
-    padding-right: 3em;
+table#userData th {
+    padding-left: 20px;
+    padding-right: 20px;
+}
+
+tr.user-data > td {
+    text-align: center;
 }
 
 footer {
