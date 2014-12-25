@@ -74,7 +74,7 @@ piktochart.DragResize.prototype.select = function(el) {
     this.elmW = this.element.offsetWidth;
     this.elmH = this.element.offsetHeight;
     if(this.ondragfocus)
-        this.ondragfocus();
+        this.ondragfocus(el.id.replace('chart_', ''));
 };
 
 // Immediately stops dragging an element. If 'delHandles' is true, this
