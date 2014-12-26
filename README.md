@@ -8,7 +8,7 @@
 - [x] The chart can be resized freely in the editor
 - [x] User can insert data to the chart as desired
 - [x] User can edit data of the chart after initial creation
-- [ ] User can change colors of the icons of the chart
+- [x] User can change colors of the icons of the chart
 - [x] User can change the icons for the chart (e.g. men, women, etc.)
 
 ### Example: ###
