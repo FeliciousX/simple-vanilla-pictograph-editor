@@ -38,6 +38,16 @@ img.tool-btn {
     cursor: pointer;
 }
 
+/* color picker */
+canvas#colorPicker {
+    z-index: 999;
+    position: fixed;
+    left: 2px;
+    top: 68px;
+    border: 1px solid black;
+    border-radius: 4px;
+}
+
 /* the editor */
 div#editor {
     border: 2px solid black;

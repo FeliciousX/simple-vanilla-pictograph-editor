@@ -186,7 +186,7 @@ piktochart.helper = {
     // show the inputs to edit chart data
     toggleChartEdit: function(id) {
         var cData = document.getElementById('data_' + id);
-        
+
         var inputs = cData.getElementsByTagName('input');
 
         for(var i = 0; i < inputs.length; i++) {
@@ -233,6 +233,12 @@ piktochart.helper = {
         selectOptions = null;
         cData = null;
     },
+    // change current selected color
+    changeCurrentChartColor: function(hex) {
+        var currentId = document.getElementById('currentId').value;
+
+        piktochart.chartArr[currentId].colorChange(hex);
+    },
 };
 
 /**
@@ -265,7 +271,7 @@ piktochart.Chart.prototype.getIconNumber = function() {
     var icons = this.value / this.ratio;
 
     // only if the remainder is more than half the ratio value
-    // adds an extra icon. 
+    // adds an extra icon.
     if(remain >= this.ratio / 2 || remain === 0) {
         this.iconNumber = icons;
         return icons;
@@ -367,7 +373,7 @@ piktochart.Chart.prototype.addDataHTML_ = function(id) {
     tr.appendChild(pIcon);
     tr.appendChild(pEditBtn);
     tr.appendChild(pDelBtn);
-    
+
     input = document.createElement('input');
     input.value = this.label;
     input.setAttribute('readonly', 'readonly');
@@ -399,7 +405,7 @@ piktochart.Chart.prototype.addDataHTML_ = function(id) {
     editBtn.onclick = function(e) {
         piktochart.event.cancelEvent(e);
 
-        // edit chart 
+        // edit chart
         piktochart.helper.toggleChartEdit(this.value);
     }
 
@@ -498,7 +504,7 @@ piktochart.Chart.prototype.edit = function(label, value, ratio, icon) {
         // prepare to replace <select> with icon
         var cIcon = document.createElement('i');
         cIcon.className = 'flaticon-' + icon;
-        
+
         // there's only 1 <select> element
         var selectOptions = this.data.getElementsByTagName('select')[0];
         var parentDiv = selectOptions.parentNode;
@@ -514,6 +520,20 @@ piktochart.Chart.prototype.edit = function(label, value, ratio, icon) {
 
     newIconNumber = null;
     tr = null;
+    totalIcons = null;
+};
+
+/* Change icon colors to specified hex */
+piktochart.Chart.prototype.colorChange = function(hex) {
+    var totalIcons = this.elem.getElementsByTagName('i');
+
+    for(var i = 0; i < totalIcons.length; i++) {
+        totalIcons[i].style.color = hex;
+    }
+
+    var cIcon = this.data.getElementsByTagName('i')[0];
+    cIcon.style.color = hex;
+
     totalIcons = null;
 };
 

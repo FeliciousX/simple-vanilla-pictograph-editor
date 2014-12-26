@@ -138,7 +138,7 @@ piktochart.DragResize.prototype.mouseDown = function(e) {
         this.select(newEl);
         this.handle = newHandle;
 
-        if(this.handle && ondragstart)
+        if(this.handle && this.ondragstart)
             this.ondragstart(hRE.test(this.handle.className));
     }
 };

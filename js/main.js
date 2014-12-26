@@ -1,3 +1,9 @@
+// hide the color picker
+function hideColorPicker() {
+    var canvas = document.getElementById('colorPicker');
+    canvas.style.display = 'none';
+};
+
 // hide the buttons on the toolbar and remove events
 function hideToolbar() {
     var toolbar = document.getElementById('group_toolbar');
@@ -6,6 +12,8 @@ function hideToolbar() {
     for(var i = 0; i < toolbar.children.length; i++) {
         toolbar.children[i].onclick = null;
     };
+
+    hideColorPicker();
 };
 
 // jump start dragging and resizing on the editor
@@ -41,8 +49,14 @@ function setupEditor() {
         var colorPicker = buttons[0];
         var delChart = buttons[1];
 
+        // toggle show color pallette
         colorPicker.onclick = function(e) {
-            alert('colorPicker');
+            var canvas = document.getElementById('colorPicker');
+
+            if(canvas.style.display == 'none')
+                canvas.style.display = 'block';
+            else
+                canvas.style.display = 'none';
         };
 
         delChart.onclick = function(e) {
@@ -50,6 +64,11 @@ function setupEditor() {
             hideToolbar();
         };
 
+        // sets the current selected chart id on html
+        var currentId = document.getElementById('currentId');
+        currentId.value = id;
+
+        currentId = null;
         colorPicker = null;
         zoomIn = null;
         zoomOut = null;
@@ -60,8 +79,11 @@ function setupEditor() {
 
     dragresize.ondragblur = hideToolbar;
 
-    /* optional, might be used later */
-    dragresize.ondragstart = function(isResize) {};
+    dragresize.ondragstart = function(isResize) {
+        hideColorPicker();
+    };
+
+    /* other dragresize API that can be extended */
     dragresize.ondragmove = function(isResize) {};
     dragresize.ondragend = function(isResize) {};
 
@@ -74,13 +96,24 @@ window.onload = function() {
         return;
     }
 
-    // run main
+    var canvas = document.getElementById('colorPicker');
+    canvas.onclick = piktochart.helper.getCanvasColorValue;
+
+    // image credit http://www.script-tutorials.com/html5-color-picker-canvas/
+    var img = new Image();
+    img.src = 'img/colorwheel.png';
+
+    img.onload = function() {
+        canvas.getContext('2d').drawImage(img, 0, 0);
+    };
+
+    // hide views
     hideToolbar();
 
     setupEditor();
 
     var addChart = document.getElementById('addChart');
     addChart.onclick = piktochart.helper.createChart;
-    addChart = null;
 
+    addChart = null;
 };
