@@ -14,6 +14,9 @@
                 <img class="tool-btn" src="img/flaticon/painter11.svg" alt="Undo" />
                 <img class="tool-btn" src="img/flaticon/delete96.svg" alt="Undo" />
             </div>
+            <div>
+                <canvas height="300" width="auto" id="colorPicker"></canvas>
+            </div>
         </div>
         <div id="editor">
             <!-- Where the chart is displayed -->
@@ -23,8 +26,8 @@
             <form id="userForm">
                 <input class="text" type="hidden" id="chartId" value="0" />
                 <input class="text" type="text" id="cLabel" value="" placeholder="Data Name" />
-                <input class="text" type="text" id="cValue" value="" placeholder="Data Value" />
-                <input class="text" type="text" id="iRatio" value="" placeholder="Per Icon Value" />
+                <input class="text" type="number" id="cValue" value="" placeholder="Data Value" />
+                <input class="text" type="number" id="iRatio" value="" placeholder="Per Icon Value" />
                 <!-- should be loaded dynamically from server side scripting -->
                 <select id="cIcon">
                     <option value="">- Select -</option>
@@ -66,12 +69,15 @@
                     <th></th>
                 </tr>
             </table>
+            <!-- hidden input to store current selected chart -->
+            <input id="currentId" type="hidden" value="-1" />
         </div>
         <footer>
             <div>Icons made by <a href="http://www.freepik.com" title="Freepik">Freepik</a>, <a href="http://www.icons8.com" title="Icons8">Icons8</a>, <a href="http://yanlu.de" title="Yannick">Yannick</a>, <a href="http://icon-works.com" title="Icon Works">Icon Works</a> from <a href="http://www.flaticon.com" title="Flaticon">www.flaticon.com</a>         is licensed by <a href="http://creativecommons.org/licenses/by/3.0/" title="Creative Commons BY 3.0">CC BY 3.0</a></div>
         </footer>
         <script type="text/javascript" src="js/piktochart.js"></script>
         <script type="text/javascript" src="js/dragresize.js"></script>
+        <script type="text/javascript" src="js/colorpicker.js"></script>
         <script type="text/javascript" src="js/main.js"></script>
     </body>
 </html>
