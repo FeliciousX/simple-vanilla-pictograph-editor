@@ -1,4 +1,4 @@
-# Simple Vanilla Pictogram Editor
+# Simple Vanilla Pictograph Editor
 
 ## Basic requirements:-
 
