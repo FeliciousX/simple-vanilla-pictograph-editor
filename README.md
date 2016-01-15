@@ -1,4 +1,4 @@
-# Piktochart Javascript Test
+# Simple Vanilla Pictogram Editor
 
 ## Basic requirements:-
 
